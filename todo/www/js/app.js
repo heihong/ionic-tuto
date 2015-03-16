@@ -3,7 +3,7 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic','starter-controller'])
+angular.module('starter', ['ionic','starter-controller','starter-services'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -17,36 +17,52 @@ angular.module('starter', ['ionic','starter-controller'])
     }
   });
 })
+    
+.config(function($stateProvider, $urlRouterProvider,$ionicConfigProvider) {
+    $urlRouterProvider.otherwise('/todos')
 
-.config(function($stateProvider,$urlRouterProvider,$ionicConfigProvider){
+    $ionicConfigProvider.tabs.position("bottom");
 
-        $ionicConfigProvider.tabs.position("bottom");
-        $stateProvider.state('todos', {
-            url: '/todos',
-            views: {
-                todos: {
-                    templateUrl: 'templates/todos.html',
-                    controller: 'TodosCtrl'
-                }
+    $stateProvider.state('app', {
+        abstract: true,
+        templateUrl: 'templates/main.html'
+    })
+
+    $stateProvider.state('app.todos', {
+        abstract: true,
+        url: '/todos',
+        views: {
+            todos: {
+                template: '<ion-nav-view></ion-nav-view>'
             }
-        })
+        }
+    })
 
-        $stateProvider.state('help', {
-            url: '/help',
-            views: {
-                help: {
-                    templateUrl: 'templates/help.html'
-                }
+    $stateProvider.state('app.todos.index', {
+        url: '',
+        templateUrl: 'templates/todos.html',
+        controller: 'TodosCtrl'
+    })
+
+    $stateProvider.state('app.todos.detail', {
+        url: '/:todo',
+        templateUrl: 'templates/todo.html',
+        controller: 'TodoCtrl',
+        resolve: {
+            todo: function($stateParams, TodosService) {
+                return TodosService.getTodo($stateParams.todo)
             }
-        })
+        }
+    })
 
-    $urlRouterProvider.otherwise('/');
+
+    $stateProvider.state('app.help', {
+        url: '/help',
+        views: {
+            help: {
+                templateUrl: 'templates/help.html'
+            }
+        }
+    })
 })
 
-//.controller('HomeCtrl', function($scope) {
-//    $scope.todos = [
-//        {title: "Take out the trash", done: true},
-//        {title: "Do laundry", done: false},
-//        {title: "Start cooking dinner", done: false}
-//    ]
-//})
